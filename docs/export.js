@@ -6,8 +6,8 @@
 const D = window.docx;
 const HEB_LETTERS = "אבגדהוזחטי";
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
-const FIG_MAX_W = 430; // פיקסלים של docx (1/96 אינץ')
-const FIG_MAX_H = 360;
+const FIG_MAX_W = 600; // פיקסלים של docx (1/96 אינץ')
+const FIG_MAX_H = 420;
 const GRAY = "666666";
 const FONT_SIZE = 24; // חצאי נקודה: 12pt
 const LINE_15 = 360; // רווח שורות 1.5 (240 = שורה אחת)
