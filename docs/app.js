@@ -33,8 +33,11 @@ const TYPE_PLURAL = { mc: "אמריקאיות", tf: "נכון / לא נכון", 
 const subName = (id) => (id ? SUBS.get(id).name : "");
 const isOnline = (q) => q.all_tags.includes("online");
 const inCart = (id) => state.cart.some((c) => c.id === id);
-const srcRef = (q) => `(בגרות ${BANK.exams[q.exam].year}, שאלה ${q.number})`;
-const YEARS = [...new Set(BANK.questions.map((q) => BANK.exams[q.exam].year))].sort((a, b) => b - a);
+/** בחינת בגרות מזוהה בשנה; מקור אחר (למשל שאלות הפיקוח) – בשם משלו */
+const examLabel = (exam) => exam.label || `בגרות ${exam.year}`;
+const srcRef = (q) => `(${examLabel(BANK.exams[q.exam])}, שאלה ${q.number})`;
+const YEARS = [...new Set(BANK.questions.map((q) => BANK.exams[q.exam].year))].filter(Boolean).sort((a, b) => b - a);
+const OTHER_SOURCES = Object.entries(BANK.exams).filter(([, e]) => !e.year);
 
 /** "חיתוך DNA – אנזימי הגבלה, ..." → כותרת + פירוט */
 function splitName(name) {
@@ -93,7 +96,7 @@ const baseVisible = (q) => !(state.hideOnline && isOnline(q));
 function visible(q) {
   if (!baseVisible(q)) return false;
   if (state.type && q.type !== state.type) return false;
-  if (state.year && String(BANK.exams[q.exam].year) !== state.year) return false;
+  if (state.year && String(BANK.exams[q.exam].year ?? q.exam) !== state.year) return false;
   const t = terms();
   if (t.length) {
     const text = SEARCH_TEXT.get(q.id);
@@ -139,7 +142,7 @@ const HELIX = `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke
 
 function renderDashboard() {
   const qs = BANK.questions.filter(baseVisible);
-  const years = [...new Set(qs.map((q) => BANK.exams[q.exam].year))].sort();
+  const years = [...new Set(qs.map((q) => BANK.exams[q.exam].year))].filter(Boolean).sort();
   $("results-head").hidden = true;
   let n = 0;
   const cards = BANK.units.map((u) => {
@@ -164,7 +167,7 @@ function renderDashboard() {
   $("results").innerHTML = `
     <section class="hero">
       <h1>מאגר שאלות בגרות בביוטכנולוגיה</h1>
-      <p>שאלות מבחינות הבגרות במערכות ביוטכנולוגיות, ממוינות לפי נושאי הלימוד. בוחרים שאלות, מתאימים סעיפים וניקוד – ומקבלים מבחן מוכן בוורד.</p>
+      <p>שאלות מבחינות הבגרות במערכות ביוטכנולוגיות ושאלות שנכתבו על ידי הפיקוח, ממוינות לפי נושאי הלימוד. בוחרים שאלות, מתאימים סעיפים וניקוד – ומקבלים מבחן מוכן בוורד.</p>
       <div class="stats">
         <div class="stat"><b>${qs.length}</b><span>שאלות</span></div>
         <div class="stat"><b>${years.length}</b><span>בחינות בגרות</span></div>
@@ -303,6 +306,7 @@ function questionCard(q) {
   } else if (q.items) {
     body += q.items.map((p) => itemHtml(q, p)).join("");
   }
+  if (exam.notice) body += `<div class="notice info"><span>${esc(exam.notice)}</span></div>`;
   if (isOnline(q)) {
     const link = exam.source_url
       ? ` <a href="${esc(exam.source_url)}" target="_blank" rel="noopener">לשאלה בבחינה המקורית ב-testbox</a>.` : "";
@@ -315,8 +319,8 @@ function questionCard(q) {
         <div class="qpath"><b>${esc(unit.name)}</b>${q.main ? ` › ${esc(shortName(q.main))}` : ""}</div>
         <div class="chips">
           <span class="chip">${TYPE_NAMES[q.type]}</span>
-          <span class="chip pts">${q.points} נק'</span>
-          <span class="chip src srcref">בגרות ${exam.year} · שאלה ${q.number}</span>
+          ${q.points != null ? `<span class="chip pts">${q.points} נק'</span>` : ""}
+          <span class="chip src srcref">${esc(examLabel(exam))} · שאלה ${q.number}</span>
           ${tagChips(q.all_tags)}
         </div>
       </div>
@@ -331,7 +335,7 @@ function questionCard(q) {
 function filterSummary() {
   const bits = [];
   if (state.type) bits.push(TYPE_PLURAL[state.type]);
-  if (state.year) bits.push(`בגרות ${state.year}`);
+  if (state.year) bits.push(examLabel(BANK.exams[state.year] || { year: state.year }));
   return bits.length ? ` · ${bits.join(" · ")}` : "";
 }
 
@@ -448,7 +452,7 @@ function toggleItem(entry, label, on) {
 /** ניקוד ברירת מחדל: כל השאלה – הניקוד המקורי; חלק מהסעיפים – סכום הסעיפים הראשיים שנבחרו */
 function defaultPoints(entry) {
   const q = QS.get(entry.id);
-  if (!entry.items || entry.items.length === q.items.length) return q.points;
+  if (!entry.items || entry.items.length === q.items.length) return q.points ?? null;
   if (!q.part_points) return null;
   const letters = new Set(entry.items.map((l) => l[0]));
   return [...letters].reduce((s, l) => s + (q.part_points[l] || 0), 0);
@@ -477,7 +481,7 @@ function renderCart() {
       <div class="cart-q-head">
         <span class="cart-q-num" aria-hidden="true"></span>
         <span class="cart-q-title"><a href="#card-${q.id}" data-goto="${q.id}">${esc(shortName(q.main) || UNITS.get(q.unit).name)}</a>
-          <small>${esc(TYPE_NAMES[q.type])} · בגרות ${BANK.exams[q.exam].year}, שאלה ${q.number}</small></span>
+          <small>${esc(TYPE_NAMES[q.type])} · ${esc(examLabel(BANK.exams[q.exam]))}, שאלה ${q.number}</small></span>
         <span class="cart-q-tools">
           <button type="button" class="mini" data-move="${i}" data-dir="-1" aria-label="הזזה למעלה" title="הזזה למעלה" ${i === 0 ? "disabled" : ""}>▲</button>
           <button type="button" class="mini" data-move="${i}" data-dir="1" aria-label="הזזה למטה" title="הזזה למטה" ${i === n - 1 ? "disabled" : ""}>▼</button>
@@ -713,7 +717,8 @@ function clearFilters() {
   state.type = "";
   state.year = "";
 }
-$("f-year").innerHTML += YEARS.map((y) => `<option value="${y}">בגרות ${y}</option>`).join("");
+$("f-year").innerHTML += OTHER_SOURCES.map(([id, e]) => `<option value="${id}">${esc(e.label)}</option>`).join("")
+  + YEARS.map((y) => `<option value="${y}">בגרות ${y}</option>`).join("");
 $("f-type").addEventListener("click", (e) => {
   const b = e.target.closest("[data-type]");
   if (!b) return;

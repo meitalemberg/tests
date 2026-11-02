@@ -27,7 +27,7 @@ def main(dirs):
         data = json.loads((d / "questions.json").read_text(encoding="utf-8"))
         exam = data["exam"]
         exams[exam["id"]] = {k: exam.get(k) for k in
-                             ("year", "title", "questionnaire", "source", "source_url", "option_style")}
+                             ("year", "title", "label", "notice", "questionnaire", "source", "source_url", "option_style")}
         passages = {p["id"]: p for p in data["passages"]}
         fig_dir = SITE / "figures" / exam["id"]
         fig_dir.mkdir(parents=True, exist_ok=True)
@@ -44,7 +44,7 @@ def main(dirs):
             if q.get("passage"):
                 out["passage"] = passages[q["passage"]]
             questions.append(out)
-    questions.sort(key=lambda q: (-exams[q["exam"]]["year"], q["number"]))
+    questions.sort(key=lambda q: (-(exams[q["exam"]]["year"] or 0), q["number"]))
     bank = {"units": TOPICS["units"], "tags": TOPICS["tags"], "exams": exams, "questions": questions}
     (SITE / "data.js").write_text(
         "window.BANK = " + json.dumps(bank, ensure_ascii=False) + ";\n", encoding="utf-8")
