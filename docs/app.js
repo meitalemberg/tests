@@ -246,6 +246,14 @@ function itemOrder(p) {
   return order.filter((k) => k === "text" || p[k]);
 }
 
+/** סעיף שהמדיה המקוונת שלו הוחלפה באיור מקורי – הערה למורה, עם קישור למקור */
+function adaptedNote(q, p) {
+  if (!p.adapted_note) return "";
+  const url = BANK.exams[q.exam].source_url;
+  const link = url ? ` <a href="${esc(url)}" target="_blank" rel="noopener">לשאלה בבחינה המקורית ב-testbox</a>.` : "";
+  return `<div class="notice info"><span>${esc(p.adapted_note)}${link}</span></div>`;
+}
+
 function itemHtml(q, p) {
   const showSub = p.subtopic && p.subtopic !== q.main;
   const meta = (showSub ? `<span class="sub">${esc(shortName(p.subtopic))}</span>` : "") + tagChips(p.tags || []);
@@ -261,6 +269,7 @@ function itemHtml(q, p) {
       })[part]()).join("")}
       ${options(q, p.options)}
       ${bank(p.interactive)}
+      ${adaptedNote(q, p)}
     </div>
   </div>`;
 }
