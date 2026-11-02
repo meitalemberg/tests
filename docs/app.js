@@ -79,7 +79,7 @@ const norm = (s) => String(s ?? "").toLowerCase().replace(/[֑-ׇ]/g, "").replac
 
 const SEARCH_TEXT = new Map(BANK.questions.map((q) => {
   const bits = [q.stem, ...(q.options || []), subName(q.main), UNITS.get(q.unit).name, srcRef(q)];
-  if (q.passage) bits.push(q.passage.title, q.passage.intro, q.passage.text);
+  if (q.passage) bits.push(q.passage.title, q.passage.intro, q.passage.text, q.passage.text_after);
   for (const p of q.items || []) {
     bits.push(p.intro, p.text, ...(p.options || []), ...((p.interactive || {}).options || []));
     if (p.table) bits.push(...p.table.headers, ...p.table.rows.flat());
@@ -211,7 +211,8 @@ function renderTopics() {
 /* ---------- כרטיס שאלה ---------- */
 
 function figs(q, list) {
-  return (list || []).map((f) => `<img class="fig" src="figures/${q.exam}/${esc(f)}" alt="איור לשאלה – לחצו להגדלה" loading="lazy">`).join("");
+  const alts = BANK.exams[q.exam].figure_alt || {};
+  return (list || []).map((f) => `<img class="fig" src="figures/${q.exam}/${esc(f)}" alt="${esc(alts[f] || "איור לשאלה")} – לחצו להגדלה" loading="lazy">`).join("");
 }
 
 function table(t) {
@@ -277,12 +278,16 @@ function itemHtml(q, p) {
   </div>`;
 }
 
-function passageHtml(ps) {
+function passageHtml(q) {
+  const ps = q.passage;
   return `<div class="passage">
     <div class="pkicker">קטע לקריאה</div>
     <h3>${hl(ps.title)}</h3>
     ${ps.intro ? `<p class="intro">${hl(ps.intro)}</p>` : ""}
     <p class="ptext">${hl(ps.text)}</p>
+    ${figs(q, ps.figures)}
+    ${ps.text_after ? `<p class="ptext">${hl(ps.text_after)}</p>` : ""}
+    ${adaptedNote(q, ps)}
     ${ps.credit ? `<p class="credit">${esc(ps.credit)}</p>` : ""}
   </div>`;
 }
@@ -298,7 +303,7 @@ function questionCard(q) {
   const unit = UNITS.get(q.unit);
   const added = inCart(q.id);
   let body = "";
-  if (q.passage) body += passageHtml(q.passage);
+  if (q.passage) body += passageHtml(q);
   if (q.stem) body += `<p class="stem">${hl(q.stem)}</p>`;
   body += figs(q, q.stem_figures);
   if (q.type === "mc") {
@@ -311,7 +316,8 @@ function questionCard(q) {
     const link = exam.source_url
       ? ` <a href="${esc(exam.source_url)}" target="_blank" rel="noopener">לשאלה בבחינה המקורית ב-testbox</a>.` : "";
     body += `<div class="notice info"><span>שאלה זו דורשת עבודה בכלים מקוונים (Entrez / BLAST).${link}
-      לבניית מבחן עם כלים דיגיטליים – השתמשו ב-MyTestBox.</span></div>`;
+      לבניית מבחן עם כלים דיגיטליים – השתמשו ב-MyTestBox.
+      תוצאות החיפוש במאגרים מתעדכנות עם הזמן, לכן מומלץ להריץ את החיפוש מחדש לפני המבחן ולבדוק את התשובה הצפויה.</span></div>`;
   }
   return `<article class="qcard u-${q.unit}${added ? " in-cart" : ""}" id="card-${q.id}">
     <div class="qhead">
@@ -498,7 +504,8 @@ function renderCart() {
   }).join("");
   const { total, missing } = cartTotals();
   $("cart-total").innerHTML = n
-    ? `<b>${n}</b> שאלות · <b>${total}</b> נק'${missing ? ` <span class="warn">(יש שאלות בלי ניקוד)</span>` : ""}` : "";
+    ? `<b>${n}</b> שאלות · <b>${total}</b> נק'${missing ? ` <span class="warn">(יש שאלות בלי ניקוד)</span>`
+      : total === 100 ? "" : ` <span class="mute">(${total < 100 ? `חסרות ${100 - total} נק' ל-100` : `${total - 100} נק' מעל 100`})</span>`}` : "";
   $("export-a").disabled = !n;
   $("export-b").disabled = !n;
   $("cart-clear").hidden = !n;

@@ -14,8 +14,9 @@ from catalog import ROOT, TOPICS, exam_dirs, main_subtopic, parts, validate  # n
 SITE = ROOT / "docs"
 
 
-def figures_of(q):
+def figures_of(q, passages):
     figs = list(q.get("figures", [])) + list(q.get("stem_figures", []))
+    figs += passages.get(q.get("passage"), {}).get("figures", [])
     for p in q.get("items", []):
         figs += p.get("figures", [])
     return figs
@@ -27,14 +28,14 @@ def main(dirs):
         data = json.loads((d / "questions.json").read_text(encoding="utf-8"))
         exam = data["exam"]
         exams[exam["id"]] = {k: exam.get(k) for k in
-                             ("year", "title", "label", "notice", "questionnaire", "source", "source_url", "option_style")}
+                             ("year", "title", "label", "notice", "questionnaire", "source", "source_url", "option_style", "figure_alt")}
         passages = {p["id"]: p for p in data["passages"]}
         fig_dir = SITE / "figures" / exam["id"]
         fig_dir.mkdir(parents=True, exist_ok=True)
         for q in data["questions"]:
             for problem in validate(q, d):
                 print(f"  {q['id']}: {problem}")
-            for f in figures_of(q):
+            for f in figures_of(q, passages):
                 shutil.copy2(d / "figures" / f, fig_dir / f)
             out = dict(q)
             out["exam"] = exam["id"]

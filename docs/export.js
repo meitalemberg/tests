@@ -50,6 +50,7 @@ async function figure(q, f) {
   const k = Math.min(1, FIG_MAX_W / bmp.width, FIG_MAX_H / bmp.height);
   return para(new D.ImageRun({
     type: "png", data: buf,
+    altText: { name: f, title: f, description: BANK.exams[q.exam].figure_alt?.[f] || "איור לשאלה" },
     transformation: { width: Math.round(bmp.width * k), height: Math.round(bmp.height * k) },
   }), { center: true, after: 120 });
 }
@@ -125,6 +126,8 @@ async function questionBlocks(entry, n, perms) {
     out.push(para(run(ps.title, { bold: true }), { center: true, after: 100 }));
     if (ps.intro) out.push(...lines(ps.intro, { italics: true }));
     out.push(...lines(ps.text, { after: 100 }));
+    out.push(...await figures(q, ps.figures));
+    if (ps.text_after) out.push(...lines(ps.text_after, { after: 100 }));
     if (ps.credit) out.push(...lines(ps.credit, { color: GRAY }));
   }
   if (q.stem) out.push(...lines(q.stem));
