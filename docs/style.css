@@ -114,6 +114,7 @@ mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 1
 .layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 28px;
   max-width: 1440px; margin: 0 auto; padding: 24px 20px 120px; align-items: start; }
 body.dash .layout { grid-template-columns: minmax(0, 1fr); }
+.site-foot { padding: 16px 20px 24px; border-top: 1px solid var(--line); text-align: center; }
 body.dash .topics, body.dash .filters, body.dash .topics-toggle { display: none; }
 
 /* ---------- עץ נושאים ---------- */
