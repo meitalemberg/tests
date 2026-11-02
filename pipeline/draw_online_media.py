@@ -3,6 +3,7 @@
     2017-Q15 סעיף ב  – יצירת צמח עגבנייה מהונדס (מצגת)
     2021-Q9          – ערכת ROSALIND לזיהוי קדמיום (סרטון)
     2017-Q16         – מחזור החיים של נגיף ה-HIV (מצגת)
+    2019-Q5          – הכנת תאי CAR T ופעולתם (מצגת)
 
 שימוש:
     .venv/bin/python -I pipeline/draw_online_media.py
@@ -441,10 +442,100 @@ def q16():
     return canvas(W, H, out), "data/exams/2017/figures/2017-q16-illustration.png", (W, H)
 
 
+# ---------- 2019-Q5: הכנת תאי CAR T ----------
+
+CELL_T, CELL_B, CELL_EDGE, NUC_T, NUC_B, CAR_C, CD19_C = "#bccbeb", "#b9c48f", "#8c8c8c", "#909fbb", "#94a577", "#e0764a", "#c94fb4"
+GENE_OLD, GENE_CAR = "#6a64c9", "#ee6c1c"
+
+
+def vector(x, y, colors, r=70):
+    """נגיף שבקופסית שלו מקטעים בצבעים הנתונים."""
+    out = "".join(spike(x, y, d, r) for d in range(0, 360, 36))
+    out += f'<circle cx="{x}" cy="{y}" r="{r}" fill="#a9d6d3" stroke="{MEMBRANE}" stroke-width="8"/>' + inner_dots(x, y, r - 13)
+    out += f'<path d="M{x - 30} {y - 28} H{x + 30} L{x + 22} {y + 28} H{x - 22} z" fill="#d9ac55" stroke="#a97f2d" stroke-width="3" stroke-linejoin="round"/>'
+    step = 40 / max(len(colors), 1)
+    for i, c in enumerate(colors):
+        out += wave(x - 20 + i * step, x - 20 + (i + 1) * step, y, c, 6, 12).replace('stroke-width="7"', 'stroke-width="4"')
+    return out
+
+
+def cell(x, y, r, fill, nucleus, marks=""):
+    return (f'<ellipse cx="{x}" cy="{y}" rx="{r}" ry="{r * .92:.1f}" fill="{fill}" stroke="{CELL_EDGE}" stroke-width="8"/>'
+            f'<ellipse cx="{x - r * .18:.1f}" cy="{y + r * .08:.1f}" rx="{r * .55:.1f}" ry="{r * .55:.1f}" fill="{nucleus}"/>' + marks)
+
+
+def rim(x, y, r, deg, d=0):
+    a = math.radians(deg)
+    return x + (r + d) * math.cos(a), y + (r + d) * r * .92 / r * math.sin(a)
+
+
+def car(x, y, r, deg):
+    x1, y1 = rim(x, y, r, deg)
+    x2, y2 = rim(x, y, r, deg, 28)
+    return line(x1, y1, x2, y2, "#46606f", 6) + f'<circle cx="{x2:.1f}" cy="{y2:.1f}" r="11" fill="{CAR_C}"/>'
+
+
+def cd19(x, y, r, deg):
+    x1, y1 = rim(x, y, r, deg)
+    x2, y2 = rim(x, y, r, deg, 16)
+    return (line(x1, y1, x2, y2, CD19_C, 5)
+            + line(x2, y2, *rim(x, y, r, deg - 7, 32), CD19_C, 5) + line(x2, y2, *rim(x, y, r, deg + 7, 32), CD19_C, 5))
+
+
+def car_t(x, y, r, degs=range(20, 380, 45)):
+    return cell(x, y, r, CELL_T, NUC_T, "".join(car(x, y, r, d) for d in degs))
+
+
+def title(x, y, s):
+    return text(x, y, s, size=CAP, anchor="start", weight=700)
+
+
+def q5():
+    W, PH = 1500, 450
+    H = PH * 2
+    out = line(W / 2, 20, W / 2, H - 20, GRID, 2) + line(20, PH, W - 20, PH, GRID, 2)
+    # שלב 1: הכנת הנשא
+    out += step_badge(W - 44, 44, 1) + title(W - 84, 56, "הכנת הנשא")
+    out += vector(1270, 265, [GENE_OLD, GENE_OLD]) + text(1270, 410, "נגיף", size=CAP)
+    out += line(1270, 262, 1370, 165, INK, 2) + text(1370, 118, ["גנים המקודדים", 'לגורמי "אלימות"'], size=30)
+    out += wave(1020, 1090, 215, GENE_CAR, 8, 22).replace('stroke-width="7"', 'stroke-width="5"')
+    out += arrow(1165, 265, 960, 265)
+    out += text(1055, 315, ["מקטע המכיל גנים", "המקודדים ל-CAR"], size=30)
+    out += vector(860, 265, [GENE_OLD, GENE_CAR, GENE_OLD]) + text(860, 410, "נגיף מהונדס", size=CAP)
+    # שלב 2: הדבקה
+    out += step_badge(W / 2 - 44, 44, 2) + title(W / 2 - 84, 56, "הדבקת תאי T בנגיף המהונדס")
+    out += cell(285, 245, 145, CELL_T, NUC_T)
+    out += wave(355, 415, 245, GENE_OLD, 6, 14).replace('stroke-width="7"', 'stroke-width="4"')
+    out += wave(372, 398, 245, GENE_CAR, 6, 14).replace('stroke-width="7"', 'stroke-width="4"')
+    out += vector(510, 245, [], 58)
+    out += text(285, 425, "תא T", size=CAP) + text(510, 370, "נגיף מהונדס", size=CAP)
+    # שלב 3: ביטוי הקולטן
+    out += step_badge(W - 44, PH + 44, 3) + title(W - 84, PH + 56, "ביטוי הקולטן CAR על-גבי תאי ה-T")
+    cx3, cy3 = 1130, PH + 265
+    out += car_t(cx3, cy3, 135)
+    bx, by = rim(cx3, cy3, 135, 335, 40)
+    out += line(bx + 8, by - 6, 1370, PH + 165, INK, 2) + text(1385, PH + 150, "הקולטן CAR", size=30)
+    out += text(cx3 - 235, cy3 + 11, "תא CAR T", size=CAP)
+    # שלב 4: חיסול תאים סרטניים
+    out += step_badge(W / 2 - 44, PH + 44, 4) + title(W / 2 - 84, PH + 56, "חיסול תאים סרטניים על-ידי תאי CAR T")
+    y4 = PH + 255
+    out += car_t(640, y4, 72, (45, 90, 135, 180, 225, 270, 315))
+    out += cell(430, y4, 72, CELL_B, NUC_B, "".join(cd19(430, y4, 72, d) for d in (0, 50, 95, 140, 180, 225, 270, 315)))
+    out += text(640, y4 + 150, "תא CAR T", size=30) + text(430, y4 + 150, "תא B סרטני", size=30)
+    out += line(430, y4 - 100, 430, y4 - 120, INK, 2) + text(430, y4 - 128, "CD19", size=30)
+    out += arrow(318, y4, 250, y4)
+    out += car_t(120, y4, 62, (0, 60, 120, 180, 240, 300))
+    rnd = random.Random(3)
+    for _ in range(14):
+        ang, d = rnd.uniform(0, 6.28), rnd.uniform(92, 108)
+        out += f'<circle cx="{120 + d * math.cos(ang):.1f}" cy="{y4 + d * math.sin(ang):.1f}" r="4" fill="{NUC_B}"/>'
+    return canvas(W, H, out), "data/exams/2019/figures/2019-q5-illustration.png", (W, H)
+
+
 def main():
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        for build in (q12, q15, q9, q16):
+        for build in (q12, q15, q9, q16, q5):
             markup, rel, (w, h) = build()
             page = browser.new_page(viewport={"width": w, "height": h}, device_scale_factor=2)
             page.set_content(f'<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0">{markup}</body></html>')
