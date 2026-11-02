@@ -2,6 +2,7 @@
     2017-Q12 סעיף ג  – ניסוי הפלסמידים (סרטון)
     2017-Q15 סעיף ב  – יצירת צמח עגבנייה מהונדס (מצגת)
     2021-Q9          – ערכת ROSALIND לזיהוי קדמיום (סרטון)
+    2017-Q16         – מחזור החיים של נגיף ה-HIV (מצגת)
 
 שימוש:
     .venv/bin/python -I pipeline/draw_online_media.py
@@ -323,10 +324,127 @@ def q9():
     return canvas(W, H, out), "data/exams/2021/figures/2021-q9-illustration.png", (W, H)
 
 
+# ---------- 2017-Q16: מחזור החיים של נגיף ה-HIV ----------
+
+MEMBRANE, CYTO, NUCLEUS, CD4_C, CCR5_C = "#4f8197", "#dcdff5", "#b4b9e0", "#f0953a", "#8f8a2b"
+VRNA, VDNA, CELL_DNA = "#1f6fc4", "#a0349f", "#1f9aa0"
+CELL = (720, 620, 560, 380)  # מרכז ורדיוסים של התא
+
+
+def on_cell(deg):
+    cx, cy, rx, ry = CELL
+    a = math.radians(deg)
+    return cx + rx * math.cos(a), cy + ry * math.sin(a), math.degrees(math.atan2(ry * math.sin(a) / ry ** 2, rx * math.cos(a) / rx ** 2))
+
+
+def strand(x, y, length, color, amp=8, period=26, w=5):
+    return wave(x, x + length, y, color, amp, period).replace('stroke-width="7"', f'stroke-width="{w}"')
+
+
+def capsid(x, y, s=1.0, angle=0):
+    return (f'<g transform="translate({x} {y}) rotate({angle}) scale({s})">'
+            '<path d="M-20 -32 H20 L13 32 H-13 z" fill="#d9ac55" stroke="#a97f2d" stroke-width="4" stroke-linejoin="round"/>'
+            + "".join(f'<path d="M{dx} -22 q7 7 0 14 q-7 7 0 14 q7 7 0 14 q-7 7 0 12" fill="none" stroke="{VRNA}" stroke-width="3"/>' for dx in (-5, 5))
+            + f'<circle cx="-10" cy="-24" r="5" fill="{CD}"/><circle cx="9" cy="23" r="5" fill="{CD}"/></g>')
+
+
+def spike(x, y, deg, r, s=1.0):
+    a = math.radians(deg)
+    x1, y1 = x + r * math.cos(a), y + r * math.sin(a)
+    x2, y2 = x + (r + 24 * s) * math.cos(a), y + (r + 24 * s) * math.sin(a)
+    return line(x1, y1, x2, y2, "#46609e", 4) + f'<circle cx="{x2:.1f}" cy="{y2:.1f}" r="{8 * s:.1f}" fill="#6079bd"/>'
+
+
+def inner_dots(x, y, r, start=0, stop=360, n=26):
+    return "".join(f'<circle cx="{x + r * math.cos(math.radians(start + (stop - start) * i / n)):.1f}" '
+                   f'cy="{y + r * math.sin(math.radians(start + (stop - start) * i / n)):.1f}" r="4" fill="#1f9d94"/>' for i in range(n + 1))
+
+
+def virus(x, y, r=70, spikes=(0, 45, 90, 135, 180, 225, 270, 315)):
+    return ("".join(spike(x, y, d, r) for d in spikes)
+            + f'<circle cx="{x}" cy="{y}" r="{r}" fill="#a9d6d3" stroke="{MEMBRANE}" stroke-width="9"/>'
+            + inner_dots(x, y, r - 13) + capsid(x, y, r / 62))
+
+
+def cd4(deg):
+    x, y, n = on_cell(deg)
+    return (f'<g transform="translate({x:.1f} {y:.1f}) rotate({n:.1f})">' + line(-4, 0, 16, 0, "#b95f18", 7)
+            + "".join(f'<circle cx="{22 + i * 17}" cy="0" r="10" fill="{CD4_C}" stroke="#b95f18" stroke-width="2"/>' for i in range(4)) + "</g>")
+
+
+def ccr5(deg):
+    x, y, n = on_cell(deg)
+    return (f'<g transform="translate({x:.1f} {y:.1f}) rotate({n + 90:.1f})">'
+            f'<path d="M-24 0 c4 -28 10 -28 12 0 c2 28 8 28 12 0 c2 -28 8 -28 12 0 c2 28 8 28 12 0" fill="none" stroke="{CCR5_C}" stroke-width="6"/></g>')
+
+
+def budding(x, y, deg, neck):
+    """בליטה בקרום התא; neck – זווית הצוואר הפונה אל תוך התא."""
+    r = 62
+    nx, ny = x + (r - 3) * math.cos(math.radians(neck)), y + (r - 3) * math.sin(math.radians(neck))
+    px, py = -math.sin(math.radians(neck)) * 26, math.cos(math.radians(neck)) * 26
+    return (f'<circle cx="{x}" cy="{y}" r="{r}" fill="{CYTO}" stroke="{MEMBRANE}" stroke-width="12"/>'
+            + inner_dots(x, y, r - 15, neck + 50, neck + 310, 16)
+            + "".join(spike(x, y, neck + d, r + 4) for d in (75, 125, 180, 235, 285))
+            + line(nx - px, ny - py, nx + px, ny + py, CYTO, 24) + capsid(x, y, 0.95, deg))
+
+
+def q16():
+    W, H = 1500, 1040
+    cx, cy, rx, ry = CELL
+    out = f'<ellipse cx="{cx}" cy="{cy}" rx="{rx}" ry="{ry}" fill="{CYTO}" stroke="{MEMBRANE}" stroke-width="14"/>'
+    for deg in (10, 130, 150, 190, 300):
+        out += cd4(deg)
+    for deg in (0, 28, 75, 105, 160, 205, 290, 322):
+        out += ccr5(deg)
+    out += f'<ellipse cx="760" cy="680" rx="240" ry="190" fill="{NUCLEUS}"/>'
+    # הנגיף והיצמדותו
+    out += virus(1335, 130) + text(1150, 62, "נגיף HIV", size=CAP, weight=700)
+    out += line(1341, 125, 1400, 245, INK, 2) + text(1405, 278, "RNA נגיפי", size=30)
+    out += line(1345, 158, 1320, 325, INK, 2) + text(1320, 365, ["אנזים מתעתק", "במהופך (RT)"], size=30)
+    out += arrow(1235, 150, 1045, 170, INK, 5) + text(1140, 135, "היצמדות", size=CAP)
+    # הנגיף על קרום התא
+    out += virus(940, 195, 64, (0, 45, 135, 180, 225, 270, 315))
+    # התאחות וחדירה
+    out += arrow(860, 165, 545, 200, INK, 5) + text(705, 150, "התאחות וחדירה", size=CAP)
+    out += budding(470, 237, 0, 90)
+    # יצירת DNA מ-RNA
+    out += arrow(470, 320, 470, 372, INK, 5)
+    out += strand(405, 400, 130, VRNA) + f'<circle cx="403" cy="400" r="7" fill="{CD}"/><circle cx="537" cy="400" r="7" fill="{CD}"/>'
+    out += text(335, 412, "RNA", size=CAP)
+    out += text(650, 425, ["יצירת DNA", "מ-RNA"], size=30)
+    out += arrow(470, 425, 470, 482, INK, 5)
+    out += strand(405, 505, 130, VRNA) + strand(405, 530, 130, VDNA) + f'<circle cx="537" cy="505" r="7" fill="{CD}"/>'
+    out += arrow(470, 550, 470, 600, INK, 5)
+    out += strand(405, 625, 130, VDNA) + strand(405, 650, 130, VDNA)
+    out += text(335, 650, "DNA", size=CAP)
+    out += arrow(475, 672, 610, 760, INK, 5)
+    # DNA התא בגרעין ותעתוק
+    out += wave(555, 680, 790, CELL_DNA, 9, 28).replace('stroke-width="7"', 'stroke-width="6"')
+    out += wave(680, 810, 790, VDNA, 9, 28).replace('stroke-width="7"', 'stroke-width="6"')
+    out += wave(810, 950, 790, CELL_DNA, 9, 28).replace('stroke-width="7"', 'stroke-width="6"')
+    out += text(755, 845, "DNA תאי", size=30)
+    out += arrow(745, 765, 745, 690, INK, 5)
+    out += strand(690, 665, 110, VRNA, w=5) + text(850, 677, "RNA", size=CAP)
+    # ייצור חלבונים ויציאת נגיף חדש
+    out += f'<path d="M790 625 C860 480 1000 460 1085 545" fill="none" stroke="{INK}" stroke-width="5"/>' + arrow(1075, 533, 1105, 565, INK, 5)
+    out += text(1085, 450, ["ייצור חלבוני", "נגיף"], size=CAP)
+    out += strand(1090, 605, 80, VRNA) + "".join(f'<circle cx="{a}" cy="{b}" r="{c}" fill="{d}"/>' for a, b, c, d in
+                                                  ((1075, 585, 8, CD), (1120, 575, 6, "#7a5fc0"), (1185, 590, 9, CD), (1190, 625, 6, "#7a5fc0"), (1100, 635, 7, CD)))
+    out += arrow(1130, 650, 1130, 835, INK, 5)
+    out += budding(1160, 925, 0, -120)
+    out += arrow(1228, 945, 1295, 935, INK, 5)
+    out += virus(1395, 925, 66) + text(1395, 768, ["נגיף HIV", "חדש"], size=CAP, weight=700)
+    # קולטנים
+    out += line(205, 440, 190, 335, INK, 2) + text(165, 318, "קולטן CCR5", size=30)
+    out += line(112, 520, 100, 475, INK, 2) + text(100, 460, "קולטן CD4", size=30)
+    return canvas(W, H, out), "data/exams/2017/figures/2017-q16-illustration.png", (W, H)
+
+
 def main():
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        for build in (q12, q15, q9):
+        for build in (q12, q15, q9, q16):
             markup, rel, (w, h) = build()
             page = browser.new_page(viewport={"width": w, "height": h}, device_scale_factor=2)
             page.set_content(f'<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0">{markup}</body></html>')
