@@ -53,14 +53,14 @@
       "842387-2021-q1.png"
      ],
      "text": "קבע, על-פי התוצאות המוצגות באיור, אם קיימים הבדלים בין הכלבים ברמת ה-DNA הגנומי או ברמת הביטוי. נמק את קביעתך.",
-     "subtopic": "GE.4",
+     "subtopic": "GE.4.2",
      "tags": [],
      "depends_on": []
     },
     {
      "label": "ג2",
      "text": "האם תוצאות הניסוי יכולות להסביר את אכילת היתר של הומינום? נמק את תשובתך.",
-     "subtopic": "GE.4",
+     "subtopic": "GE.4.2",
      "tags": [],
      "depends_on": []
     }
@@ -114,7 +114,7 @@
     {
      "label": "ג2",
      "text": "האם נדרשה החדרה של גן מדווח במקרה זה? נמק את תשובתך.",
-     "subtopic": "GE.4",
+     "subtopic": "GE.4.1",
      "tags": [],
      "depends_on": []
     }
@@ -340,7 +340,7 @@
       ],
       "options_source": "page"
      },
-     "subtopic": "IM.4",
+     "subtopic": "IM.4.3",
      "tags": [
       "interactive"
      ],
@@ -349,7 +349,7 @@
     {
      "label": "ב",
      "text": "ציין את שמה של שיטה אימונודיאגנוסטית נוספת שבאמצעותה יכול החוקר לבדוק את רמת הביטוי של החלבון המקודד על-ידי הגן krn. מהו היתרון שיש לשיטה שהצעת על-פני התספיג האימונולוגי?",
-     "subtopic": "IM.4",
+     "subtopic": "IM.4.3",
      "tags": [],
      "depends_on": []
     },
@@ -360,14 +360,14 @@
       "842387-2021-q6.png"
      ],
      "text": "תאר את תוצאות הניסוי.",
-     "subtopic": "IM.4",
+     "subtopic": "IM.4.3",
      "tags": [],
      "depends_on": []
     },
     {
      "label": "ג2",
      "text": "האם תוצאות הניסוי תומכות בהשערתו של החוקר? נמק את תשובתך.",
-     "subtopic": "IM.4",
+     "subtopic": "IM.4.3",
      "tags": [],
      "depends_on": []
     }
@@ -401,7 +401,7 @@
       ],
       "options_source": "page"
      },
-     "subtopic": "BI.3",
+     "subtopic": "BI.1",
      "tags": [
       "online",
       "interactive"
@@ -411,7 +411,7 @@
     {
      "label": "א2",
      "text": "כמה תוצאות התקבלו בחיפוש?",
-     "subtopic": "BI.3",
+     "subtopic": "BI.1",
      "tags": [
       "online"
      ],
@@ -480,7 +480,7 @@
     {
      "label": "ב3",
      "text": "באתר הראשון יש שבע חומצות אמיניות, שחלקן רחוקות זו מזו ברצף (למשל 312 ו-371), ובכל זאת הן מרכיבות את אותו אתר. כיצד אפשר להסביר זאת?",
-     "subtopic": "BI.2",
+     "subtopic": "BI.1",
      "tags": [],
      "depends_on": []
     },
@@ -491,7 +491,7 @@
       "842387-2021-q7b.png"
      ],
      "text": "מהו הרצף שגרם לתגובה החיסונית החזקה ביותר?",
-     "subtopic": null,
+     "subtopic": "BI.6",
      "tags": [],
      "depends_on": []
     },
@@ -504,7 +504,7 @@
       "רצף א' הוא mRNA המקודד למקטע בחלבון שלא מוצג היטב על גבי ממברנת התאים, ולכן מערכת החיסון לא זיהתה אותו.",
       "רצף א' הוא mRNA המקודד למקטע בחלבון המעטפת, ולכן הוא מעורר תגובה חיסונית חזקה."
      ],
-     "subtopic": null,
+     "subtopic": "BI.6",
      "tags": [],
      "depends_on": []
     },
@@ -555,7 +555,7 @@
     {
      "label": "א1",
      "text": "החוקרת קבעה שהחיידק שגרם את הזיהום הוא Klebsiella pneumoniae. הבא שני נימוקים לקביעתה של החוקרת. היעזר בהעמדות הרצפים.",
-     "subtopic": "BI.3",
+     "subtopic": "BI.2",
      "tags": [
       "online"
      ],
@@ -564,7 +564,7 @@
     {
      "label": "א2",
      "text": "האם צפויים להיות אינטרונים בגן X? נמק את תשובתך.",
-     "subtopic": "BI.2",
+     "subtopic": null,
      "tags": [
       "intro"
      ],
@@ -574,7 +574,7 @@
      "label": "ב1",
      "intro": "החוקרת חשדה שהזיהום נגרם על-ידי חיידק (חיידק ב') שכבר גרם לכמה זיהומים אחרים בבית החולים בחודשים האחרונים. להלן הרצף של הגן X מהגנום של חיידק ב' (רצף ב').\nAtgcgttatgttcgcctgtgtgttatctccctgttagccaacctgccactagcggtatacgccggtccac\nagccgcttgagcagattaaacaaagcgaaagccagctgtcgggccgcgtggggatggtggaaatggatct\nggccagcggccgcacgctggccgcctggcgcgccgatgaacgctttcccatggtgagcacctttaaagtg\nctgctgtgcggcgcggtgctggcgcgggtggatgccggggtcgaacaactggatcggcggatccactacc\ngccagcaggatctggtggactactccccggtcagcgaaaaacaccttaccgacgggatgacgatcggcga\nactctgcgccgccgccatcaccatgagcgataacagcgctggcaatctgctgctggccaccgtcggcggc\ncccgcgggattgaccgcctttctgcgccagatcggtgacaacgtcacccgtcttgaccgctgggaaacgg\ncactgaatgaggcgcttcccggcgacatgcgcgacaccactaccccggccagcatggccgccacgctgcg\ntaaactactgactgcgcagcatctgagcgcccgttcacagcagcagctcctgcagtggatggtggacgat\ncgggttgccggcccgctgatccgcgccgtgctgccggcgggctggtttatcgccgacaagaccggggctg\ngcgaacggggtgcgcgcggcattgtcgccctgctcggcccggacggcaaagcggagcgcattgtggtgat\nttatatgcgggatacgccggcgaccatcgccgagcgtaaccagcagatcgccgctatcggcgcggcgctg\natcgagcactggcaacgctaa\nהחוקרת רצתה לבדוק מיהו חיידק ב' באמצעות שאילתה ב-Blast-n. היכנס לכלי Blast-n, העתק את רצף ב' לחלון החיפוש ובצע חיפוש. הסתכל על התוצאה הראשונה שמתקבלת.",
      "text": "מהו שמו של חיידק ב'?",
-     "subtopic": "BI.3",
+     "subtopic": "BI.2",
      "tags": [
       "online"
      ],
@@ -594,7 +594,7 @@
       ],
       "options_source": "page"
      },
-     "subtopic": "BI.3",
+     "subtopic": "BI.2",
      "tags": [
       "online",
       "interactive"
@@ -614,7 +614,7 @@
       ],
       "options_source": "page"
      },
-     "subtopic": "BI.3",
+     "subtopic": "BI.2",
      "tags": [
       "online",
       "interactive"
@@ -624,7 +624,7 @@
     {
      "label": "ג",
      "text": "בבית חולים אחר אותר חיידק עמיד נוסף, שהגן X שלו זהה ב-85% לגן X של חיידק א', אבל החלבון המקודד על-ידי הגן X שלו זהה ב-99% לחלבון המקודד על-ידי הגן X של חיידק א'. הצע הסבר אפשרי לתופעה.",
-     "subtopic": "BI.2",
+     "subtopic": null,
      "tags": [],
      "depends_on": []
     },
@@ -635,14 +635,14 @@
       "842387-2021-q8.png"
      ],
      "text": "מהו הריכוז המינימלי של האנטיביוטיקה שבו נצפתה תמותה מלאה של חיידק א'?",
-     "subtopic": null,
+     "subtopic": "BI.6",
      "tags": [],
      "depends_on": []
     },
     {
      "label": "ד2",
      "text": "מהו הריכוז המינימלי של האנטיביוטיקה שבו נצפתה תמותה מלאה של חיידק ב'?",
-     "subtopic": null,
+     "subtopic": "BI.6",
      "tags": [],
      "depends_on": []
     },
@@ -657,7 +657,7 @@
       ],
       "options_source": "page"
      },
-     "subtopic": null,
+     "subtopic": "BI.6",
      "tags": [
       "interactive"
      ],
