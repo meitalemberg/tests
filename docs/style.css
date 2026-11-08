@@ -5,6 +5,7 @@
   --warn: #8a5a00; --warnbg: #fff4dc; --info: #275a8c; --infobg: #e7f0fa; --danger: #b3261e;
   --ge: #1f7a5c; --ge-soft: #e0f1e9; --cc: #1b6a8c; --cc-soft: #e0eef6;
   --im: #6b4aa0; --im-soft: #eee8f7; --bi: #a2541a; --bi-soft: #f8ecdf; --old: #66726b; --old-soft: #eceee9;
+  --lab: #a63d6b; --lab-soft: #f8e6ee;
   --mark: #fff0a8;
   --shadow-sm: 0 1px 2px rgba(20, 30, 24, .06);
   --shadow: 0 1px 2px rgba(20, 30, 24, .05), 0 6px 20px rgba(20, 30, 24, .06);
@@ -20,7 +21,7 @@
     --acc: #6fcca5; --acc-hover: #8ad8b7; --acc-soft: #1d3329; --acc-ink: #0d2219;
     --warn: #f0c46a; --warnbg: #2d2514; --info: #9cc4ee; --infobg: #16263a; --danger: #ff8a80;
     --ge: #6fcca5; --ge-soft: #1c3229; --cc: #7cc3e3; --cc-soft: #172b36;
-    --im: #bba3e6; --im-soft: #292138; --bi: #eba870; --bi-soft: #33251a; --old: #a7b2ab; --old-soft: #242a26;
+    --im: #bba3e6; --im-soft: #292138; --bi: #eba870; --bi-soft: #33251a; --old: #a7b2ab; --old-soft: #242a26; --lab: #ec9bbd; --lab-soft: #35202a;
     --mark: #5c4d0f;
     --shadow-sm: none; --shadow: 0 1px 0 rgba(255,255,255,.02); --shadow-lg: 0 10px 40px rgba(0,0,0,.5);
     color-scheme: dark;
@@ -31,7 +32,7 @@
   --acc: #6fcca5; --acc-hover: #8ad8b7; --acc-soft: #1d3329; --acc-ink: #0d2219;
   --warn: #f0c46a; --warnbg: #2d2514; --info: #9cc4ee; --infobg: #16263a; --danger: #ff8a80;
   --ge: #6fcca5; --ge-soft: #1c3229; --cc: #7cc3e3; --cc-soft: #172b36;
-  --im: #bba3e6; --im-soft: #292138; --bi: #eba870; --bi-soft: #33251a; --old: #a7b2ab; --old-soft: #242a26;
+  --im: #bba3e6; --im-soft: #292138; --bi: #eba870; --bi-soft: #33251a; --old: #a7b2ab; --old-soft: #242a26; --lab: #ec9bbd; --lab-soft: #35202a;
   --mark: #5c4d0f;
   --shadow-sm: none; --shadow: 0 1px 0 rgba(255,255,255,.02); --shadow-lg: 0 10px 40px rgba(0,0,0,.5);
   color-scheme: dark;
@@ -40,6 +41,7 @@
 .u-CC { --u: var(--cc); --u-soft: var(--cc-soft); }
 .u-IM { --u: var(--im); --u-soft: var(--im-soft); }
 .u-BI { --u: var(--bi); --u-soft: var(--bi-soft); }
+.u-LAB { --u: var(--lab); --u-soft: var(--lab-soft); }
 .u-OLD { --u: var(--old); --u-soft: var(--old-soft); }
 
 /* ---------- בסיס ---------- */
