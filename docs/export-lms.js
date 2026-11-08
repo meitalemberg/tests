@@ -311,6 +311,131 @@ function createExam() {
 `;
 }
 
+/* ---------- My Test Box: דף העתקה (HTML עצמאי) ---------- */
+
+const mime = (f) => (/\.jpe?g$/i.test(f) ? "image/jpeg" : "image/png");
+
+const COPY_CSS = `
+body{font-family:Arial,"Arial Hebrew",sans-serif;background:#f4f5f1;color:#18211c;margin:0;line-height:1.6}
+main{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:24px;margin:0 0 6px}
+.how{background:#e7f0fa;border-radius:10px;padding:10px 14px;margin:10px 0 18px;font-size:15px}
+.q{background:#fff;border:1px solid #e1e5de;border-radius:14px;padding:14px 16px;margin:18px 0}
+.q>h2{font-size:19px;margin:0 0 8px}
+.ref{color:#66726b;font-weight:400;font-size:15px}
+.part{border-top:1px dashed #cfd5cc;margin-top:12px;padding-top:8px}
+.part>h3{font-size:16px;margin:0 0 4px;color:#1f6b55}
+.blk{display:flex;gap:10px;align-items:flex-start;border:1px solid #e1e5de;border-radius:10px;padding:8px 10px;margin:8px 0;background:#fcfdfb}
+.blk .kind{flex:none;width:86px;font-size:12px;color:#66726b;padding-top:3px}
+.blk .body{flex:1;min-width:0}
+.blk .body p{margin:0 0 4px}
+.blk .acts{flex:none;display:flex;flex-direction:column;gap:4px}
+.blk img{max-width:100%;height:auto;display:block;margin:0 auto}
+button,.dl{font:inherit;font-size:13px;border:1px solid #1f6b55;color:#1f6b55;background:#fff;border-radius:8px;padding:4px 10px;cursor:pointer;text-decoration:none;text-align:center;white-space:nowrap}
+button:hover,.dl:hover{background:#e2f0ea}
+button.ok{background:#1f6b55;color:#fff}
+table.t{border-collapse:collapse;margin:4px 0}
+table.t th,table.t td{border:1px solid #999;padding:4px 8px;text-align:right}
+table.t th{background:#eee}
+.pts{display:inline-block;background:#e2f0ea;color:#1f6b55;border-radius:99px;padding:0 8px;font-size:13px;margin-inline-start:6px}
+.note{color:#8a5a00;background:#fff4dc;border-radius:8px;padding:4px 10px;font-size:14px}
+@media print{.acts,.how{display:none}}
+`;
+
+/* הסקריפט שרץ בדף שירד: העתקה כטקסט מעוצב (כולל טבלאות) או כתמונה */
+const COPY_JS = `
+async function pngBlob(img){
+  const c=document.createElement('canvas'); c.width=img.naturalWidth; c.height=img.naturalHeight;
+  c.getContext('2d').drawImage(img,0,0); return new Promise(r=>c.toBlob(r,'image/png'));
+}
+function fallbackCopy(el){
+  const r=document.createRange(); r.selectNodeContents(el); const s=getSelection(); s.removeAllRanges(); s.addRange(r);
+  const ok=document.execCommand('copy'); s.removeAllRanges(); return ok;
+}
+document.addEventListener('click',async(e)=>{
+  const b=e.target.closest('button[data-act]'); if(!b) return;
+  const body=b.closest('.blk').querySelector('.body');
+  let ok=false;
+  try{
+    if(b.dataset.act==='img'){
+      const blob=await pngBlob(body.querySelector('img'));
+      await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]); ok=true;
+    }else{
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html':new Blob(['<div dir="rtl">'+body.innerHTML+'</div>'],{type:'text/html'}),
+        'text/plain':new Blob([body.innerText],{type:'text/plain'})})]); ok=true;
+    }
+  }catch(err){ ok=b.dataset.act!=='img'&&fallbackCopy(body); }
+  const t=b.textContent; b.textContent=ok?'הועתק ✓':'לא הועתק – נסו להוריד'; b.classList.toggle('ok',ok);
+  setTimeout(()=>{b.textContent=t;b.classList.remove('ok');},1600);
+});
+`;
+
+function blk(kind, body, { img = null } = {}) {
+  const acts = img
+    ? `<button data-act="img">העתקת תמונה</button><a class="dl" download="${esc(img)}" href="#" data-dl>הורדה</a>`
+    : `<button data-act="text">העתקה</button>`;
+  return `<div class="blk"><div class="kind">${esc(kind)}</div><div class="body">${body}</div><div class="acts">${acts}</div></div>`;
+}
+
+async function imgBlk(q, f, kind = "איור") {
+  const src = `data:${mime(f)};base64,${await base64Of(figUrl(q, f))}`;
+  return blk(kind, `<img src="${src}" alt="${esc(figAlt(q, f))}">`, { img: `${q.exam}-${f}` });
+}
+
+async function testboxHtml() {
+  const title = examTitle();
+  const head = headerText();
+  let out = "";
+  for (const m of examModel(0.5)) {
+    const { q } = m;
+    let h = `<section class="q"><h2>שאלה ${m.n}${m.points != null ? `<span class="pts">${m.points} נק'</span>` : ""}`
+      + `${state.showSource ? ` <span class="ref">${esc(m.ref)}</span>` : ""}</h2>`;
+    if (m.online) h += `<p class="note">${esc(ONLINE_NOTE)}</p>`;
+    if (m.passage) {
+      const ps = m.passage;
+      h += blk("קטע לקריאה", `<p><b>${esc(ps.title)}</b></p>${htmlLines(ps.intro)}${htmlLines(ps.text)}`);
+      for (const f of ps.figures || []) h += await imgBlk(q, f);
+      if (ps.text_after) h += blk("המשך הקטע", htmlLines(ps.text_after));
+      if (ps.credit) h += blk("מקור", htmlLines(ps.credit));
+    }
+    if (m.stem) h += blk("פתיח", htmlLines(m.stem));
+    for (const f of m.stemFigures) h += await imgBlk(q, f);
+    for (const part of m.parts) {
+      h += `<div class="part">${part.label ? `<h3>סעיף ${esc(part.label)}<span class="pts">${part.points} נק'</span></h3>` : ""}`;
+      for (const piece of part.order) {
+        if (piece === "intro") h += blk("רקע לסעיף", htmlLines(part.intro));
+        if (piece === "figures") for (const f of part.figures) h += await imgBlk(q, f);
+        if (piece === "table") h += blk("טבלה", htmlTable(part.table).replace("<table", `<table class="t"`));
+        if (piece === "text") h += blk("השאלה", htmlLines(part.text));
+      }
+      if (part.options) {
+        part.options.forEach((o, i) => { h += blk(`אפשרות ${optLabel(m.style, i)}`, htmlLines(o)); });
+      }
+      if (part.bank) h += blk("מחסן היגדים", htmlLines(part.bank));
+      h += `</div>`;
+    }
+    out += h + `</section>`;
+  }
+  return `<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)} – להעתקה ל-My Test Box</title><style>${COPY_CSS}</style></head>
+<body><main>
+<h1>${esc(title)}</h1>
+${head ? `<div>${htmlLines(head)}</div>` : ""}
+<div class="how"><b>איך משתמשים:</b> פותחים את הבחינה בעורך של My Test Box (הסטודיו של מט"ח) ויוצרים בה שאלות לפי הסדר שכאן.
+לכל קטע לוחצים <b>העתקה</b> ומדביקים (Ctrl+V) בשדה המתאים בעורך – הטקסט והטבלאות עוברים מעוצבים.
+איורים: <b>העתקת תמונה</b> ומדביקים, או <b>הורדה</b> ומעלים מהמחשב. בשאלות אמריקאיות – מדביקים כל אפשרות בשדה שלה ומסמנים את התשובה הנכונה.</div>
+${out}
+<p style="color:#66726b;font-size:13px">כל הזכויות על כתיבת בחינות הבגרות שמורות למשרד החינוך ולמט"ח.</p>
+</main>
+<script>
+document.querySelectorAll('a[data-dl]').forEach(a=>{a.href=a.closest('.blk').querySelector('img').src;});
+${COPY_JS}
+</script>
+</body></html>`;
+}
+
 /* ---------- הורדה + הוראות ---------- */
 
 const HELP = {
@@ -320,6 +445,8 @@ const HELP = {
   forms: () => `<b>יצירת טופס גוגל:</b> ב-<a href="https://script.google.com" target="_blank" rel="noopener">script.google.com</a> → פרויקט חדש →
     מדביקים את תוכן הקובץ → שמירה → בוחרים <b>createExam</b> → הפעלה → מאשרים גישה. הקישורים לטופס יופיעו ביומן הביצוע.
     טבלאות מופיעות בטופס כתמונות. בשאלות אמריקאיות יש לסמן מפתח תשובות בעריכת הטופס.`,
+  mytestbox: () => `<b>My Test Box:</b> פותחים את הקובץ שירד בדפדפן (Chrome). לכל קטע יש כפתור <b>העתקה</b> – מדביקים בעורך הבחינה של מט"ח.
+    איורים מעתיקים כתמונה או מורידים ומעלים.`,
 };
 
 async function run(kind) {
@@ -333,6 +460,9 @@ async function run(kind) {
       const r = await moodleXml();
       save(new Blob([r.xml], { type: "application/xml" }), `${base} - מודל.xml`);
       help.innerHTML = HELP.moodle(r);
+    } else if (kind === "mytestbox") {
+      save(new Blob([await testboxHtml()], { type: "text/html" }), `${base} - להעתקה ל-My Test Box.html`);
+      help.innerHTML = HELP.mytestbox();
     } else {
       save(new Blob([formsScript()], { type: "text/plain" }), `${base} - גוגל פורמס.gs.txt`);
       help.innerHTML = HELP.forms();
@@ -347,6 +477,7 @@ async function run(kind) {
 
 document.getElementById("export-moodle").addEventListener("click", () => run("moodle"));
 document.getElementById("export-forms").addEventListener("click", () => run("forms"));
-Object.assign(window, { moodleXml, formsScript, examModel });
+document.getElementById("export-mytestbox").addEventListener("click", () => run("mytestbox"));
+Object.assign(window, { moodleXml, formsScript, testboxHtml, examModel });
 
 })();

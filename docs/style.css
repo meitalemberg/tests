@@ -352,7 +352,7 @@ table.qt th { background: var(--bg); font-weight: 700; }
 .cart-foot { border-top: 1px solid var(--line); padding: 14px 20px 16px; background: var(--card); }
 .cart-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
 .cart-actions .btn { height: 46px; }
-.cart-actions.more { grid-template-columns: 1fr 1fr; margin-top: 8px; }
+.cart-actions.more { grid-template-columns: 1fr 1fr 1fr; margin-top: 8px; }
 .cart-actions.more .btn { height: 38px; font-size: 14px; }
 .export-help { margin-top: 8px; padding: 8px 10px; border-radius: var(--r-sm); background: var(--infobg); color: var(--ink2); line-height: 1.6; }
 .export-help a { color: var(--info); }

@@ -510,6 +510,7 @@ function renderCart() {
   $("export-b").disabled = !n;
   $("export-moodle").disabled = !n;
   $("export-forms").disabled = !n;
+  $("export-mytestbox").disabled = !n;
   $("cart-clear").hidden = !n;
   $("cartbar").hidden = !n;
   $("cartbar-text").innerHTML = `<b>${n}</b> ${n === 1 ? "שאלה" : "שאלות"} במבחן · <b>${total}</b> נק'`;

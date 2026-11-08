@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="style.css?v=12">
+<link rel="stylesheet" href="style.css?v=13">
 <script>
   // ערכת צבעים שנבחרה ידנית – לפני הציור, כדי שלא יהבהב
   try { const t = localStorage.getItem("bagrut-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
@@ -128,6 +128,7 @@
     <div class="cart-actions more" role="group" aria-label="ייצוא למערכות מקוונות">
       <button type="button" id="export-moodle" class="btn" disabled title="קובץ XML לייבוא לבנק השאלות במודל">מודל (XML)</button>
       <button type="button" id="export-forms" class="btn" disabled title="סקריפט שיוצר טופס גוגל (בוחן)">גוגל פורמס</button>
+      <button type="button" id="export-mytestbox" class="btn" disabled title="דף עם כפתורי העתקה לבניית הבחינה בעורך של מט&quot;ח">My Test Box</button>
     </div>
     <div id="export-help" class="export-help small" hidden></div>
     <div class="cart-foot-row">
@@ -144,8 +145,8 @@
 
 <script src="vendor/docx-9.5.1.umd.js"></script>
 <script src="data.js?v=19"></script>
-<script src="app.js?v=13"></script>
+<script src="app.js?v=14"></script>
 <script src="export.js?v=11"></script>
-<script src="export-lms.js?v=1"></script>
+<script src="export-lms.js?v=2"></script>
 </body>
 </html>
