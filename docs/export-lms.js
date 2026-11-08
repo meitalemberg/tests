@@ -439,10 +439,10 @@ ${COPY_JS}
 /* ---------- הורדה + הוראות ---------- */
 
 const HELP = {
-  moodle: (r) => `<b>ייבוא למודל:</b> בקורס → בנק שאלות → <b>ייבוא</b> → פורמט <b>Moodle XML</b> → גוררים את הקובץ → ייבוא.
+  moodle: (r) => `<b>ייבוא ל-Moodle:</b> בקורס → בנק שאלות → <b>ייבוא</b> → פורמט <b>Moodle XML</b> → גוררים את הקובץ → ייבוא.
     השאלות (${r.count}) ייכנסו לקטגוריה בשם המבחן. בהוספה לבוחן ממיינים לפי <b>שם השאלה</b> כדי לשמור על הסדר.
     ${r.mc ? `<br>⚠ ב-${r.mc} שאלות אמריקאיות יש לסמן את התשובה הנכונה ולמחוק את האפשרות "למורה: סמנו את התשובה הנכונה" (בשם השאלה כתוב "לסמן תשובה נכונה").` : ""}`,
-  forms: () => `<b>יצירת טופס גוגל:</b> ב-<a href="https://script.google.com" target="_blank" rel="noopener">script.google.com</a> → פרויקט חדש →
+  forms: () => `<b>יצירת טופס ב-Google Forms:</b> ב-<a href="https://script.google.com" target="_blank" rel="noopener">script.google.com</a> → פרויקט חדש →
     מדביקים את תוכן הקובץ → שמירה → בוחרים <b>createExam</b> → הפעלה → מאשרים גישה. הקישורים לטופס יופיעו ביומן הביצוע.
     טבלאות מופיעות בטופס כתמונות. בשאלות אמריקאיות יש לסמן מפתח תשובות בעריכת הטופס.`,
   mytestbox: () => `<b>My Test Box:</b> פותחים את הקובץ שירד בדפדפן (Chrome). לכל קטע יש כפתור <b>העתקה</b> – מדביקים בעורך הבחינה של מט"ח.
@@ -458,13 +458,13 @@ async function run(kind) {
     const base = safeName(examTitle());
     if (kind === "moodle") {
       const r = await moodleXml();
-      save(new Blob([r.xml], { type: "application/xml" }), `${base} - מודל.xml`);
+      save(new Blob([r.xml], { type: "application/xml" }), `${base} - Moodle.xml`);
       help.innerHTML = HELP.moodle(r);
     } else if (kind === "mytestbox") {
       save(new Blob([await testboxHtml()], { type: "text/html" }), `${base} - להעתקה ל-My Test Box.html`);
       help.innerHTML = HELP.mytestbox();
     } else {
-      save(new Blob([formsScript()], { type: "text/plain" }), `${base} - גוגל פורמס.gs.txt`);
+      save(new Blob([formsScript()], { type: "text/plain" }), `${base} - Google Forms.gs.txt`);
       help.innerHTML = HELP.forms();
     }
     help.hidden = false;
