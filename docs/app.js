@@ -508,6 +508,8 @@ function renderCart() {
       : total === 100 ? "" : ` <span class="mute">(${total < 100 ? `חסרות ${100 - total} נק' ל-100` : `${total - 100} נק' מעל 100`})</span>`}` : "";
   $("export-a").disabled = !n;
   $("export-b").disabled = !n;
+  $("export-moodle").disabled = !n;
+  $("export-forms").disabled = !n;
   $("cart-clear").hidden = !n;
   $("cartbar").hidden = !n;
   $("cartbar-text").innerHTML = `<b>${n}</b> ${n === 1 ? "שאלה" : "שאלות"} במבחן · <b>${total}</b> נק'`;
